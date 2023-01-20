@@ -52,6 +52,8 @@ jobs:
           filters: |
             accountingservice:
               - 'src/accountingservice/**'
+            adservice:
+              - 'src/adservice/**'
 
       # Put services with changes into a variable
       - name: Set changes in services
