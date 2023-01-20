@@ -65,7 +65,7 @@ jobs:
         run: echo "accountingservice"
 
       - name: Contains adservice
-        if: contains(${{ steps.set_changed_services.outputs.services }}, 'adservice')
+        if: contains(steps.set_changed_services.outputs.services, 'adservice')
         run: echo "adservice"
 
       - name: Contains random
