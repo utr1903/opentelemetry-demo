@@ -1,6 +1,6 @@
 # Accounting Service
 
-Tests
+Test
 This service consumes new orders from a Kafka topic.
 
 ## Local Build
