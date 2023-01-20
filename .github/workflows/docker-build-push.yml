@@ -64,12 +64,13 @@ jobs:
           if [[ ${{ steps.detect_changed_services.outputs.accountingservice }} == 'true' ]]; then
             services="${services}|accountingservice"
           fi
-          echo $services
+          if [[ ${{ steps.detect_changed_services.outputs.adservice }} == 'true' ]]; then
+            services="${services}|adservice"
+          fi
           echo "services=${services}" >> $GITHUB_OUTPUT
 
-      # - name: Contains accountingservice
-      #   if: contains(${{ steps.set_changed_services.outputs.services }}, 'accountingservice')
-      #   run: echo "accountingservice"
+      - name: Prompt changes in services
+        run: echo "${{ steps.set_changed_services.outputs.services }}"
 
       # - name: Contains adservice
       #   if: contains(steps.set_changed_services.outputs.services, 'adservice')
