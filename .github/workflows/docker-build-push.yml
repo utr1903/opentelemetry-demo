@@ -60,9 +60,13 @@ jobs:
         run: |
           echo "${{ steps.set_changed_services.outputs.services }}"
 
-      # - name: Test
-      #   if: steps.filter.outputs.accountingservice == 'true'
-      #   run: echo "HERE"
+      - name: Contains yes
+        if: contains(${{ steps.set_changed_services.outputs.services }}, 'accountingservice')
+        run: echo "YES"
+
+      - name: Contains no
+        if: contains(${{ steps.set_changed_services.outputs.services }}, 'adservice')
+        run: echo "YES"
 
       # - name: Docker meta
       #   id: meta
