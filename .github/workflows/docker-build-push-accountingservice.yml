@@ -17,14 +17,22 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+
+      # Checkout the repo
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Extract branch name
+        id: extract_branch
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+
+      # Add filters for each service
       - name: Filter
         uses: dorny/paths-filter@v2
         id: filter
         with:
-          base: test
+          base: ${{ steps.extract_branch.outputs.branch }}
           filters: |
             accountingservice:
               - 'src/accountingservice/**'
