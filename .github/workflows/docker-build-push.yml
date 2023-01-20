@@ -23,14 +23,10 @@ jobs:
     steps:
 
       # Checkout the repo
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      # - name: Extract branch name
-      #   id: extract_branch
-      #   shell: bash
-      #   run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-
+      # Extract the branch name for commit path filtering
       - name: Extract branch name
         id: extract_branch
         shell: bash
@@ -41,7 +37,7 @@ jobs:
         run: echo "${{ steps.extract_branch.outputs.branch }}"
 
       # Add filters for each service
-      - name: Filter
+      - name: Detect changes in services
         uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -50,9 +46,17 @@ jobs:
             accountingservice:
               - 'src/accountingservice/**'
 
-      - name: Prompt
+      - name: Set changes in services
+        id: set_changed_services
         shell: bash
-        run: echo "${{ steps.filter.outputs.accountingservice }}"
+        run: |
+          services=""
+          echo "services=${{ services }}|${{ steps.filter.outputs.accountingservice }}" >> $GITHUB_OUTPUT
+
+      - name: Promt changes in services
+        shell: bash
+        run: |
+          echo "${{ steps.set_changed_services.outputs.services }}"
 
       # - name: Test
       #   shell: bash
@@ -61,7 +65,7 @@ jobs:
       #     # echo "${{ steps.filter.outputs.${{ env.accountingservice }} }}"
 
       - name: Test
-        if: steps.filter.outputs.${{ env.accountingservice }} == 'true'
+        if: steps.filter.outputs.accountingservice == 'true'
         run: echo "HERE"
 
       # - name: Docker meta
