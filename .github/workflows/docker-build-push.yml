@@ -50,8 +50,13 @@ jobs:
             accountingservice:
               - 'src/accountingservice/**'
 
-      - if: steps.filter.outputs.${{ env.accountingservice }} == 'true'
-        name: Test
+      - name: Test
+        run: |          
+          echo "${{ steps.filter.outputs.accountingservice }}"
+          echo "${{ steps.filter.outputs.${{ env.accountingservice }} }}"
+
+      - name: Test
+        if: steps.filter.outputs.${{ env.accountingservice }} == 'true'
         run: echo "HERE"
 
       # - name: Docker meta
