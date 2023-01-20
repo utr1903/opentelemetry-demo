@@ -50,9 +50,9 @@ jobs:
             accountingservice:
               - 'src/accountingservice/**'
 
-      - name: Test
+      - name: Prompt
         shell: bash
-        run: echo "${{ steps.filter.outputs.accountingservice }}"
+        run: echo "${{ steps.filter.outputs.${{ env.accountingservice }} }}"
 
       # - name: Test
       #   shell: bash
