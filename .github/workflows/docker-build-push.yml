@@ -52,7 +52,7 @@ jobs:
 
       - name: Prompt
         shell: bash
-        run: echo "${{ steps.filter.outputs.${{ env.accountingservice }} }}"
+        run: echo "${{ steps.filter.outputs.accountingservice }}"
 
       # - name: Test
       #   shell: bash
