@@ -51,7 +51,9 @@ jobs:
         shell: bash
         run: |
           services=""
-          echo "services=${{ services }}|${{ steps.filter.outputs.accountingservice }}" >> $GITHUB_OUTPUT
+          services="${services}|accountingservice"
+          echo $services
+          echo "services=${services}" >> $GITHUB_OUTPUT
 
       - name: Promt changes in services
         shell: bash
@@ -59,14 +61,8 @@ jobs:
           echo "${{ steps.set_changed_services.outputs.services }}"
 
       # - name: Test
-      #   shell: bash
-      #   run: |
-      #     echo "${{ steps.filter.outputs.accountingservice }}"
-      #     # echo "${{ steps.filter.outputs.${{ env.accountingservice }} }}"
-
-      - name: Test
-        if: steps.filter.outputs.accountingservice == 'true'
-        run: echo "HERE"
+      #   if: steps.filter.outputs.accountingservice == 'true'
+      #   run: echo "HERE"
 
       # - name: Docker meta
       #   id: meta
