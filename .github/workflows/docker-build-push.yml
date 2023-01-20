@@ -51,9 +51,14 @@ jobs:
               - 'src/accountingservice/**'
 
       - name: Test
-        run: |
-          echo "${{ steps.filter.outputs.accountingservice }}"
-          # echo "${{ steps.filter.outputs.${{ env.accountingservice }} }}"
+        shell: bash
+        run: echo "${{ steps.filter.outputs.accountingservice }}"
+
+      # - name: Test
+      #   shell: bash
+      #   run: |
+      #     echo "${{ steps.filter.outputs.accountingservice }}"
+      #     # echo "${{ steps.filter.outputs.${{ env.accountingservice }} }}"
 
       - name: Test
         if: steps.filter.outputs.${{ env.accountingservice }} == 'true'
