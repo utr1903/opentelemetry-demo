@@ -51,7 +51,7 @@ jobs:
               - 'src/accountingservice/**'
 
       - name: Test
-        run: |          
+        run: |
           echo "${{ steps.filter.outputs.accountingservice }}"
           echo "${{ steps.filter.outputs.${{ env.accountingservice }} }}"
 
