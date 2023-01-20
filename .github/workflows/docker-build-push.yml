@@ -60,13 +60,17 @@ jobs:
         run: |
           echo "${{ steps.set_changed_services.outputs.services }}"
 
-      - name: Contains yes
+      - name: Contains accountingservice
         if: contains(${{ steps.set_changed_services.outputs.services }}, 'accountingservice')
-        run: echo "YES"
+        run: echo "accountingservice"
 
-      - name: Contains no
+      - name: Contains adservice
         if: contains(${{ steps.set_changed_services.outputs.services }}, 'adservice')
-        run: echo "YES"
+        run: echo "adservice"
+
+      - name: Contains random
+        if: contains('|accountingservice', 'XXXXXX')
+        run: echo "XXXXXX"
 
       # - name: Docker meta
       #   id: meta
