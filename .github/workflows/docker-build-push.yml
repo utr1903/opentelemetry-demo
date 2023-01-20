@@ -14,8 +14,12 @@ on:
       - src/**
 
 jobs:
-  docker:
+  build_and_push_images:
     runs-on: ubuntu-latest
+
+    env:
+      accountingservice: "accountingservice"
+    
     steps:
 
       # Checkout the repo
@@ -46,7 +50,7 @@ jobs:
             accountingservice:
               - 'src/accountingservice/**'
 
-      - if: steps.filter.outputs.accountingservice == 'true'
+      - if: steps.filter.outputs.${{ env.accountingservice }} == 'true'
         name: Test
         run: echo "HERE"
 
