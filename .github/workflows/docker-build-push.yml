@@ -7,11 +7,13 @@ on:
       - 'test'
     paths:
       - src/**
+      - test/**
   pull_request:
     branches:
       - 'test'
     paths:
       - src/**
+      - test/**
 
 jobs:
   build_and_push_images:
@@ -238,23 +240,7 @@ jobs:
 
           echo "services=${services}" >> $GITHUB_OUTPUT
 
-      - name: Prompt changes in services
-        run: echo "${{ steps.set_changed_services.outputs.services }}"
-
-      - name: Contains
-        if: contains(steps.set_changed_services.outputs.services, matrix.file_tag.tag_suffix)
-        run: echo "${{ matrix.file_tag.tag_suffix }}"
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: name/app
-
-      - name: Prompt Docker tag
-        run: echo ${{ steps.meta.outputs.tags }}
-
-      - name: Docker Login
+      - name: Login to Docker
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
@@ -272,8 +258,7 @@ jobs:
           file: ${{ matrix.file_tag.file }}
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}:${{ env.RELEASE_VERSION || 'pr' }}-${{matrix.file_tag.tag_suffix }}
 
       # - name: Build and push
       #   uses: docker/build-push-action@v3
