@@ -23,59 +23,8 @@ jobs:
           - file: ./src/adservice/Dockerfile
             tag_suffix: adservice
             context: ./
-          - file: ./src/cartservice/src/Dockerfile
-            tag_suffix: cartservice
-            context: ./
-          - file: ./src/checkoutservice/Dockerfile
-            tag_suffix: checkoutservice
-            context: ./
-          - file: ./src/currencyservice/Dockerfile
-            tag_suffix: currencyservice
-            context: ./src/currencyservice
-          - file: ./src/emailservice/Dockerfile
-            tag_suffix: emailservice
-            context: ./src/emailservice
-          - file: ./src/featureflagservice/Dockerfile
-            tag_suffix: featureflagservice
-            context: ./
-          - file: ./src/frontend/Dockerfile
-            tag_suffix: frontend
-            context: ./
-          - file: ./src/frontendproxy/Dockerfile
-            tag_suffix: frontendproxy
-            context: ./
-          - file: ./src/loadgenerator/Dockerfile
-            tag_suffix: loadgenerator
-            context: ./
-          - file: ./src/paymentservice/Dockerfile
-            tag_suffix: paymentservice
-            context: ./
-          - file: ./src/productcatalogservice/Dockerfile
-            tag_suffix: productcatalogservice
-            context: ./
-          - file: ./src/quoteservice/Dockerfile
-            tag_suffix: quoteservice
-            context: ./
-          - file: ./src/shippingservice/Dockerfile
-            tag_suffix: shippingservice
-            context: ./
-          - file: ./src/recommendationservice/Dockerfile
-            tag_suffix: recommendationservice
-            context: ./
-          - file: ./src/kafka/Dockerfile
-            tag_suffix: kafka
-            context: ./
           - file: ./src/accountingservice/Dockerfile
             tag_suffix: accountingservice
-            context: ./
-          - file: ./src/frauddetectionservice/Dockerfile
-            tag_suffix: frauddetectionservice
-            context: ./
-          - file: ./src/frontend/Dockerfile.cypress
-            tag_suffix: frontend-tests
-            context: ./
-          - file: ./test/Dockerfile
-            tag_suffix: integrationTests
             context: ./
     
     steps:
@@ -116,17 +65,17 @@ jobs:
           echo $services
           echo "services=${services}" >> $GITHUB_OUTPUT
 
-      - name: Contains accountingservice
-        if: contains(${{ steps.set_changed_services.outputs.services }}, 'accountingservice')
-        run: echo "accountingservice"
+      # - name: Contains accountingservice
+      #   if: contains(${{ steps.set_changed_services.outputs.services }}, 'accountingservice')
+      #   run: echo "accountingservice"
 
-      - name: Contains adservice
-        if: contains(steps.set_changed_services.outputs.services, 'adservice')
-        run: echo "adservice"
+      # - name: Contains adservice
+      #   if: contains(steps.set_changed_services.outputs.services, 'adservice')
+      #   run: echo "adservice"
 
       - name: Contains
-        if: contains(steps.set_changed_services.outputs.services, ${{ matrix.file_tag.tag_suffix }})
-        run: echo "XXXXXX"
+        if: contains(steps.set_changed_services.outputs.services, matrix.file_tag.tag_suffix)
+        run: echo "${{ matrix.file_tag.tag_suffix }}"
 
       # - name: Docker meta
       #   id: meta
