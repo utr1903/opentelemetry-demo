@@ -1,0 +1,274 @@
+name: Docker build & push
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    paths:
+      - src/**
+      - test/**
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - src/**
+      - test/**
+
+jobs:
+  build_and_push_images:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKERHUB_REPO: otel-demo
+
+    strategy:
+      matrix:
+        file_tag:
+          - file: ./src/adservice/Dockerfile
+            tag_suffix: adservice
+            context: ./
+          - file: ./src/cartservice/src/Dockerfile
+            tag_suffix: cartservice
+            context: ./
+          - file: ./src/checkoutservice/Dockerfile
+            tag_suffix: checkoutservice
+            context: ./
+          - file: ./src/currencyservice/Dockerfile
+            tag_suffix: currencyservice
+            context: ./src/currencyservice
+          - file: ./src/emailservice/Dockerfile
+            tag_suffix: emailservice
+            context: ./src/emailservice
+          - file: ./src/featureflagservice/Dockerfile
+            tag_suffix: featureflagservice
+            context: ./
+          - file: ./src/frontend/Dockerfile
+            tag_suffix: frontend
+            context: ./
+          - file: ./src/frontendproxy/Dockerfile
+            tag_suffix: frontendproxy
+            context: ./
+          - file: ./src/loadgenerator/Dockerfile
+            tag_suffix: loadgenerator
+            context: ./
+          - file: ./src/paymentservice/Dockerfile
+            tag_suffix: paymentservice
+            context: ./
+          - file: ./src/productcatalogservice/Dockerfile
+            tag_suffix: productcatalogservice
+            context: ./
+          - file: ./src/quoteservice/Dockerfile
+            tag_suffix: quoteservice
+            context: ./
+          - file: ./src/shippingservice/Dockerfile
+            tag_suffix: shippingservice
+            context: ./
+          - file: ./src/recommendationservice/Dockerfile
+            tag_suffix: recommendationservice
+            context: ./
+          - file: ./src/kafka/Dockerfile
+            tag_suffix: kafka
+            context: ./
+          - file: ./src/accountingservice/Dockerfile
+            tag_suffix: accountingservice
+            context: ./
+          - file: ./src/frauddetectionservice/Dockerfile
+            tag_suffix: frauddetectionservice
+            context: ./
+          - file: ./src/frontend/Dockerfile.cypress
+            tag_suffix: frontend-tests
+            context: ./
+          - file: ./test/Dockerfile
+            tag_suffix: integrationTests
+            context: ./
+    
+    steps:
+
+      # Checkout the repo
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # Extract the branch name for commit path filtering
+      - name: Extract branch name
+        id: extract_branch
+        shell: bash
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+
+      # Detect which services have changes
+      - name: Detect changes in services
+        uses: dorny/paths-filter@v2
+        id: detect_changed_services
+        with:
+          base: ${{ steps.extract_branch.outputs.branch }}
+          filters: |
+            adservice:
+              - 'src/adservice/**'
+            cartservice:
+              - 'src/cartservice/**'
+            checkoutservice:
+              - 'src/checkoutservice/**'
+            currencyservice:
+              - 'src/currencyservice/**'
+            emailservice:
+              - 'src/emailservice/**'
+            featureflagservice:
+              - 'src/featureflagservice/**'
+            frontend:
+              - 'src/frontend/**'
+            frontendproxy:
+              - 'src/frontendproxy/**'
+            loadgenerator:
+              - 'src/loadgenerator/**'
+            paymentservice:
+              - 'src/paymentservice/**'
+            productcatalogservice:
+              - 'src/productcatalogservice/**'
+            quoteservice:
+              - 'src/quoteservice/**'
+            shippingservice:
+              - 'src/shippingservice/**'
+            recommendationservice:
+              - 'src/recommendationservice/**'
+            kafka:
+              - 'src/kafka/**'
+            accountingservice:
+              - 'src/accountingservice/**'
+            frauddetectionservice:
+              - 'src/frauddetectionservice/**'
+            integrationTests:
+              - 'test/**'
+
+      # Put services with changes into a variable
+      - name: Set changes in services
+        id: set_changed_services
+        shell: bash
+        run: |
+          services=""
+          
+          # adservice
+          if [[ ${{ steps.detect_changed_services.outputs.adservice }} == 'true' ]]; then
+            services="${services}|adservice"
+          fi
+
+          # cartservice
+          if [[ ${{ steps.detect_changed_services.outputs.cartservice }} == 'true' ]]; then
+            services="${services}|cartservice"
+          fi
+
+          # checkoutservice
+          if [[ ${{ steps.detect_changed_services.outputs.checkoutservice }} == 'true' ]]; then
+            services="${services}|checkoutservice"
+          fi
+
+          # currencyservice
+          if [[ ${{ steps.detect_changed_services.outputs.currencyservice }} == 'true' ]]; then
+            services="${services}|currencyservice"
+          fi
+
+          # emailservice
+          if [[ ${{ steps.detect_changed_services.outputs.emailservice }} == 'true' ]]; then
+            services="${services}|emailservice"
+          fi
+
+          # featureflagservice
+          if [[ ${{ steps.detect_changed_services.outputs.featureflagservice }} == 'true' ]]; then
+            services="${services}|featureflagservice"
+          fi
+
+          # frontend
+          if [[ ${{ steps.detect_changed_services.outputs.frontend }} == 'true' ]]; then
+            services="${services}|frontend"
+            services="${services}|frontend-tests"
+          fi
+
+          # frontendproxy
+          if [[ ${{ steps.detect_changed_services.outputs.frontendproxy }} == 'true' ]]; then
+            services="${services}|frontendproxy"
+          fi
+
+          # loadgenerator
+          if [[ ${{ steps.detect_changed_services.outputs.loadgenerator }} == 'true' ]]; then
+            services="${services}|loadgenerator"
+          fi
+
+          # paymentservice
+          if [[ ${{ steps.detect_changed_services.outputs.paymentservice }} == 'true' ]]; then
+            services="${services}|paymentservice"
+          fi
+
+          # productcatalogservice
+          if [[ ${{ steps.detect_changed_services.outputs.productcatalogservice }} == 'true' ]]; then
+            services="${services}|productcatalogservice"
+          fi
+
+          # quoteservice
+          if [[ ${{ steps.detect_changed_services.outputs.quoteservice }} == 'true' ]]; then
+            services="${services}|quoteservice"
+          fi
+
+          # shippingservice
+          if [[ ${{ steps.detect_changed_services.outputs.shippingservice }} == 'true' ]]; then
+            services="${services}|shippingservice"
+          fi
+
+          # recommendationservice
+          if [[ ${{ steps.detect_changed_services.outputs.recommendationservice }} == 'true' ]]; then
+            services="${services}|recommendationservice"
+          fi
+
+          # kafka
+          if [[ ${{ steps.detect_changed_services.outputs.kafka }} == 'true' ]]; then
+            services="${services}|kafka"
+          fi
+
+          # accountingservice
+          if [[ ${{ steps.detect_changed_services.outputs.accountingservice }} == 'true' ]]; then
+            services="${services}|accountingservice"
+          fi
+
+          # frauddetectionservice
+          if [[ ${{ steps.detect_changed_services.outputs.frauddetectionservice }} == 'true' ]]; then
+            services="${services}|frauddetectionservice"
+          fi
+
+          # integrationTests
+          if [[ ${{ steps.detect_changed_services.outputs.integrationTests }} == 'true' ]]; then
+            services="${services}|integrationTests"
+          fi
+
+          echo "services=${services}" >> $GITHUB_OUTPUT
+
+      # Login to Docker Hub
+      - name: Login to Dockerhub
+        if: contains(steps.set_changed_services.outputs.services, matrix.file_tag.tag_suffix)
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # Set up Docker buildx
+      - name: Set up Docker Buildx
+        if: contains(steps.set_changed_services.outputs.services, matrix.file_tag.tag_suffix)
+        uses: docker/setup-buildx-action@v2
+
+      # Build and push images for linux/amd64 (default)
+      - name: Build and push images
+        if: contains(steps.set_changed_services.outputs.services, matrix.file_tag.tag_suffix)
+        uses: docker/build-push-action@v3.2.0
+        with:
+          context: ${{ matrix.file_tag.context }}
+          file: ${{ matrix.file_tag.file }}
+          platforms: linux/amd64
+          push: ${{ steps.extract_branch.outputs.branch == 'main' }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPO }}:${{ env.RELEASE_VERSION || 'pr' }}-${{matrix.file_tag.tag_suffix }}
+
+      # Build and push images for linux/arm64
+      - name: Build and push images
+        if: contains(steps.set_changed_services.outputs.services, matrix.file_tag.tag_suffix)
+        uses: docker/build-push-action@v3.2.0
+        with:
+          context: ${{ matrix.file_tag.context }}
+          file: ${{ matrix.file_tag.file }}
+          platforms: linux/arm64
+          push: ${{ steps.extract_branch.outputs.branch == 'main' }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_REPO }}:${{ env.RELEASE_VERSION || 'pr' }}-${{matrix.file_tag.tag_suffix }}-arm
